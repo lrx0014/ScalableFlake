@@ -21,27 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type AcquireUIDReq struct {
+type GenerateUIDReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AcquireUIDReq) Reset() {
-	*x = AcquireUIDReq{}
+func (x *GenerateUIDReq) Reset() {
+	*x = GenerateUIDReq{}
 	mi := &file_v1_uid_generator_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AcquireUIDReq) String() string {
+func (x *GenerateUIDReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AcquireUIDReq) ProtoMessage() {}
+func (*GenerateUIDReq) ProtoMessage() {}
 
-func (x *AcquireUIDReq) ProtoReflect() protoreflect.Message {
+func (x *GenerateUIDReq) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_uid_generator_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,39 +53,39 @@ func (x *AcquireUIDReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AcquireUIDReq.ProtoReflect.Descriptor instead.
-func (*AcquireUIDReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use GenerateUIDReq.ProtoReflect.Descriptor instead.
+func (*GenerateUIDReq) Descriptor() ([]byte, []int) {
 	return file_v1_uid_generator_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *AcquireUIDReq) GetTenantId() string {
+func (x *GenerateUIDReq) GetTenantId() string {
 	if x != nil {
 		return x.TenantId
 	}
 	return ""
 }
 
-type AcquireUIDResp struct {
+type GenerateUIDResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           uint64                 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AcquireUIDResp) Reset() {
-	*x = AcquireUIDResp{}
+func (x *GenerateUIDResp) Reset() {
+	*x = GenerateUIDResp{}
 	mi := &file_v1_uid_generator_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AcquireUIDResp) String() string {
+func (x *GenerateUIDResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AcquireUIDResp) ProtoMessage() {}
+func (*GenerateUIDResp) ProtoMessage() {}
 
-func (x *AcquireUIDResp) ProtoReflect() protoreflect.Message {
+func (x *GenerateUIDResp) ProtoReflect() protoreflect.Message {
 	mi := &file_v1_uid_generator_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -97,12 +97,12 @@ func (x *AcquireUIDResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AcquireUIDResp.ProtoReflect.Descriptor instead.
-func (*AcquireUIDResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use GenerateUIDResp.ProtoReflect.Descriptor instead.
+func (*GenerateUIDResp) Descriptor() ([]byte, []int) {
 	return file_v1_uid_generator_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *AcquireUIDResp) GetUid() uint64 {
+func (x *GenerateUIDResp) GetUid() uint64 {
 	if x != nil {
 		return x.Uid
 	}
@@ -113,14 +113,13 @@ var File_v1_uid_generator_proto protoreflect.FileDescriptor
 
 const file_v1_uid_generator_proto_rawDesc = "" +
 	"\n" +
-	"\x16v1/uid_generator.proto\x12\ruid_generator\",\n" +
-	"\rAcquireUIDReq\x12\x1b\n" +
-	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"\"\n" +
-	"\x0eAcquireUIDResp\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\x04R\x03uid2Y\n" +
-	"\fUIDGenerator\x12I\n" +
-	"\n" +
-	"AcquireUID\x12\x1c.uid_generator.AcquireUIDReq\x1a\x1d.uid_generator.AcquireUIDRespB\x06Z\x04.;v1b\x06proto3"
+	"\x16v1/uid_generator.proto\x12\ruid_generator\"-\n" +
+	"\x0eGenerateUIDReq\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"#\n" +
+	"\x0fGenerateUIDResp\x12\x10\n" +
+	"\x03uid\x18\x01 \x01(\x04R\x03uid2\\\n" +
+	"\fUIDGenerator\x12L\n" +
+	"\vGenerateUID\x12\x1d.uid_generator.GenerateUIDReq\x1a\x1e.uid_generator.GenerateUIDRespB\x06Z\x04.;v1b\x06proto3"
 
 var (
 	file_v1_uid_generator_proto_rawDescOnce sync.Once
@@ -136,12 +135,12 @@ func file_v1_uid_generator_proto_rawDescGZIP() []byte {
 
 var file_v1_uid_generator_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_v1_uid_generator_proto_goTypes = []any{
-	(*AcquireUIDReq)(nil),  // 0: uid_generator.AcquireUIDReq
-	(*AcquireUIDResp)(nil), // 1: uid_generator.AcquireUIDResp
+	(*GenerateUIDReq)(nil),  // 0: uid_generator.GenerateUIDReq
+	(*GenerateUIDResp)(nil), // 1: uid_generator.GenerateUIDResp
 }
 var file_v1_uid_generator_proto_depIdxs = []int32{
-	0, // 0: uid_generator.UIDGenerator.AcquireUID:input_type -> uid_generator.AcquireUIDReq
-	1, // 1: uid_generator.UIDGenerator.AcquireUID:output_type -> uid_generator.AcquireUIDResp
+	0, // 0: uid_generator.UIDGenerator.GenerateUID:input_type -> uid_generator.GenerateUIDReq
+	1, // 1: uid_generator.UIDGenerator.GenerateUID:output_type -> uid_generator.GenerateUIDResp
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

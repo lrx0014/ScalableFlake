@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UIDGenerator_AcquireUID_FullMethodName = "/uid_generator.UIDGenerator/AcquireUID"
+	UIDGenerator_GenerateUID_FullMethodName = "/uid_generator.UIDGenerator/GenerateUID"
 )
 
 // UIDGeneratorClient is the client API for UIDGenerator service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UIDGeneratorClient interface {
-	AcquireUID(ctx context.Context, in *AcquireUIDReq, opts ...grpc.CallOption) (*AcquireUIDResp, error)
+	GenerateUID(ctx context.Context, in *GenerateUIDReq, opts ...grpc.CallOption) (*GenerateUIDResp, error)
 }
 
 type uIDGeneratorClient struct {
@@ -37,10 +37,10 @@ func NewUIDGeneratorClient(cc grpc.ClientConnInterface) UIDGeneratorClient {
 	return &uIDGeneratorClient{cc}
 }
 
-func (c *uIDGeneratorClient) AcquireUID(ctx context.Context, in *AcquireUIDReq, opts ...grpc.CallOption) (*AcquireUIDResp, error) {
+func (c *uIDGeneratorClient) GenerateUID(ctx context.Context, in *GenerateUIDReq, opts ...grpc.CallOption) (*GenerateUIDResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AcquireUIDResp)
-	err := c.cc.Invoke(ctx, UIDGenerator_AcquireUID_FullMethodName, in, out, cOpts...)
+	out := new(GenerateUIDResp)
+	err := c.cc.Invoke(ctx, UIDGenerator_GenerateUID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *uIDGeneratorClient) AcquireUID(ctx context.Context, in *AcquireUIDReq, 
 // All implementations must embed UnimplementedUIDGeneratorServer
 // for forward compatibility.
 type UIDGeneratorServer interface {
-	AcquireUID(context.Context, *AcquireUIDReq) (*AcquireUIDResp, error)
+	GenerateUID(context.Context, *GenerateUIDReq) (*GenerateUIDResp, error)
 	mustEmbedUnimplementedUIDGeneratorServer()
 }
 
@@ -62,8 +62,8 @@ type UIDGeneratorServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUIDGeneratorServer struct{}
 
-func (UnimplementedUIDGeneratorServer) AcquireUID(context.Context, *AcquireUIDReq) (*AcquireUIDResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AcquireUID not implemented")
+func (UnimplementedUIDGeneratorServer) GenerateUID(context.Context, *GenerateUIDReq) (*GenerateUIDResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateUID not implemented")
 }
 func (UnimplementedUIDGeneratorServer) mustEmbedUnimplementedUIDGeneratorServer() {}
 func (UnimplementedUIDGeneratorServer) testEmbeddedByValue()                      {}
@@ -86,20 +86,20 @@ func RegisterUIDGeneratorServer(s grpc.ServiceRegistrar, srv UIDGeneratorServer)
 	s.RegisterService(&UIDGenerator_ServiceDesc, srv)
 }
 
-func _UIDGenerator_AcquireUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AcquireUIDReq)
+func _UIDGenerator_GenerateUID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateUIDReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UIDGeneratorServer).AcquireUID(ctx, in)
+		return srv.(UIDGeneratorServer).GenerateUID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UIDGenerator_AcquireUID_FullMethodName,
+		FullMethod: UIDGenerator_GenerateUID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UIDGeneratorServer).AcquireUID(ctx, req.(*AcquireUIDReq))
+		return srv.(UIDGeneratorServer).GenerateUID(ctx, req.(*GenerateUIDReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -112,8 +112,8 @@ var UIDGenerator_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UIDGeneratorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AcquireUID",
-			Handler:    _UIDGenerator_AcquireUID_Handler,
+			MethodName: "GenerateUID",
+			Handler:    _UIDGenerator_GenerateUID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

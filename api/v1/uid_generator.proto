@@ -5,13 +5,13 @@ package uid_generator;
 option go_package = ".;v1";
 
 service UIDGenerator {
-  rpc AcquireUID (AcquireUIDReq) returns (AcquireUIDResp);
+  rpc GenerateUID (GenerateUIDReq) returns (GenerateUIDResp);
 }
 
-message AcquireUIDReq {
+message GenerateUIDReq {
   string tenant_id = 1;
 }
 
-message AcquireUIDResp {
+message GenerateUIDResp {
   uint64 uid = 1;
 }

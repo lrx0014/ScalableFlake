@@ -31,13 +31,17 @@ func NewRedisAllocator(addr string) allocator.Allocator {
 	}
 }
 
-func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint16, error) {
+func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (machineId uint16, err error) {
 	if tenantID == "" {
 		tenantID = "default"
 	}
 
 	log.Infof("init: tenant: %s", tenantID)
 	log.Infof("init: driver: redis")
+
+	defer func() {
+		log.Infof("acquired machine id: %d", machineId)
+	}()
 
 	lockKey := r.lockPrefix + tenantID
 	counterKey := r.keyPrefix + tenantID
@@ -59,7 +63,8 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint16, 
 	}
 
 	if id <= r.maxID {
-		return uint16(id), nil
+		machineId = uint16(id)
+		return
 	}
 
 	script := `
@@ -67,12 +72,15 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint16, 
         local val = redis.call("INCR", KEYS[1])
         return val
     `
-	newID, err := r.client.Eval(ctx, script, []string{counterKey}).Int64()
+	id, err = r.client.Eval(ctx, script, []string{counterKey}).Int64()
 	if err != nil {
 		return 0, fmt.Errorf("redis reset script error: %w", err)
 	}
 
-	return uint16(newID), nil
+	log.Infof("reset machine id due to reaching maxinum")
+	machineId = uint16(id)
+
+	return
 }
 
 func (r *AllocatorRedis) Release(ctx context.Context, tenantID string, machineID uint64) error {

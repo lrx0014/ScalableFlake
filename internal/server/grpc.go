@@ -17,8 +17,8 @@ func NewGRPCServer() *GRPCServer {
 	return &GRPCServer{}
 }
 
-func (s *GRPCServer) AcquireUID(ctx context.Context, req *pb.AcquireUIDReq) (resp *pb.AcquireUIDResp, err error) {
-	resp = &pb.AcquireUIDResp{}
+func (s *GRPCServer) GenerateUID(ctx context.Context, req *pb.GenerateUIDReq) (resp *pb.GenerateUIDResp, err error) {
+	resp = &pb.GenerateUIDResp{}
 	uid, err := snowflake.GenerateUID()
 	if err != nil {
 		log.Errorf("failed to generate uid: %v", err)
