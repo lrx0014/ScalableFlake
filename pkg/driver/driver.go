@@ -3,7 +3,7 @@ package driver
 import (
 	"github.com/lrx0014/ScalableFlake/pkg/driver/redis"
 	allocator "github.com/lrx0014/ScalableFlake/pkg/machine"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 

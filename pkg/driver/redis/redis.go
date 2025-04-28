@@ -22,6 +22,9 @@ func NewRedisAllocator(addr string) allocator.Allocator {
 		Addr: addr,
 		DB:   0,
 	})
+	if client == nil {
+		panic("redis client is nil")
+	}
 	return &AllocatorRedis{
 		client:     client,
 		keyPrefix:  "uid_gen:",
@@ -48,9 +51,11 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (machineI
 
 	success, err := r.client.SetNX(ctx, lockKey, "1", r.lockTTL).Result()
 	if err != nil {
+		log.Errorf("acquire: failed to acquire lock: %v", err)
 		return 0, fmt.Errorf("redis setnx lock error: %w", err)
 	}
 	if !success {
+		log.Errorf("acquire: failed to acquire lock")
 		return 0, fmt.Errorf("cannot acquire lock for tenant %s, please retry", tenantID)
 	}
 	defer func() {
@@ -59,6 +64,7 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (machineI
 
 	id, err := r.client.Incr(ctx, counterKey).Result()
 	if err != nil {
+		log.Errorf("acquire: failed to exec incr: %v", err)
 		return 0, fmt.Errorf("redis incr error: %w", err)
 	}
 
@@ -74,6 +80,7 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (machineI
     `
 	id, err = r.client.Eval(ctx, script, []string{counterKey}).Int64()
 	if err != nil {
+		log.Errorf("acquire: failed to reset: %v", err)
 		return 0, fmt.Errorf("redis reset script error: %w", err)
 	}
 
