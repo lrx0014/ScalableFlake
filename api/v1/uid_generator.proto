@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package uid_generator;
+
+option go_package = ".;v1";
+
+service UIDGenerator {
+  rpc AcquireUID (AcquireUIDReq) returns (AcquireUIDResp);
+}
+
+message AcquireUIDReq {
+  string tenant_id = 1;
+}
+
+message AcquireUIDResp {
+  uint64 uid = 1;
+}
