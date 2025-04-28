@@ -3,6 +3,8 @@ package server
 import (
 	"encoding/json"
 	allocator "github.com/lrx0014/ScalableFlake/pkg/machine"
+	"github.com/lrx0014/ScalableFlake/pkg/snowflake"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -10,25 +12,19 @@ type HTTPServer struct {
 	allocator allocator.Allocator
 }
 
-func NewHTTPServer(a allocator.Allocator) *HTTPServer {
-	return &HTTPServer{allocator: a}
+func NewHTTPServer() *HTTPServer {
+	return &HTTPServer{}
 }
 
 func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	tenantID := r.URL.Query().Get("tenant_id")
-	if tenantID == "" {
-		http.Error(w, "tenant_id missing", http.StatusBadRequest)
-		return
-	}
-
-	id, err := s.allocator.Acquire(r.Context(), tenantID)
+	uid, err := snowflake.GenerateUID()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Errorf("failed to generate uid: %v", err)
 		return
 	}
 
 	resp := map[string]interface{}{
-		"uid": id,
+		"uid": uid,
 	}
 	err = json.NewEncoder(w).Encode(resp)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	allocator "github.com/lrx0014/ScalableFlake/pkg/machine"
 	"github.com/redis/go-redis/v9"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -30,7 +31,14 @@ func NewRedisAllocator(addr string) allocator.Allocator {
 	}
 }
 
-func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint64, error) {
+func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint16, error) {
+	if tenantID == "" {
+		tenantID = "default"
+	}
+
+	log.Infof("init: tenant: %s", tenantID)
+	log.Infof("init: driver: redis")
+
 	lockKey := r.lockPrefix + tenantID
 	counterKey := r.keyPrefix + tenantID
 
@@ -51,7 +59,7 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint64, 
 	}
 
 	if id <= r.maxID {
-		return uint64(id), nil
+		return uint16(id), nil
 	}
 
 	script := `
@@ -64,7 +72,7 @@ func (r *AllocatorRedis) Acquire(ctx context.Context, tenantID string) (uint64, 
 		return 0, fmt.Errorf("redis reset script error: %w", err)
 	}
 
-	return uint64(newID), nil
+	return uint16(newID), nil
 }
 
 func (r *AllocatorRedis) Release(ctx context.Context, tenantID string, machineID uint64) error {

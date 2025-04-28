@@ -3,6 +3,8 @@ package machine
 import "context"
 
 type Allocator interface {
-	Acquire(ctx context.Context, tenantID string) (uint64, error)
+	// Acquire a machine_id
+	Acquire(ctx context.Context, tenantID string) (uint16, error)
+	// Release a machine_id
 	Release(ctx context.Context, tenantID string, machineID uint64) error
 }
