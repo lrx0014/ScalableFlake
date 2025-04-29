@@ -59,9 +59,7 @@ func GenerateUID(tenant string) (uid uint64, err error) {
 }
 
 func Close() {
-	if allocator != nil {
-		allocator.Close()
-	}
+	machine.Close()
 	log.Infof("closed sonyflake")
 }
 
