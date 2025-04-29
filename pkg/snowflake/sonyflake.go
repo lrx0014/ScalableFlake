@@ -10,43 +10,48 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/sony/sonyflake"
 	"os"
+	"sync"
 	"time"
 
 	_ "github.com/lrx0014/ScalableFlake/pkg/driver/redis"
 )
 
+var lockSfs sync.RWMutex
 var sfs map[string]*sonyflake.Sonyflake
-var allocators []machine.Allocator
+var allocator machine.Allocator
 
 func init() {
 	sfs = map[string]*sonyflake.Sonyflake{}
-	backend, tenant, addr := config()
-	allocator, err := machine.Get(backend)
+	backend, addr := config()
+	alloc, err := machine.Get(backend)
 	if err != nil {
 		panic(err)
 	}
-	allocator.New(addr, generateInstanceID())
+	alloc.New(addr, generateInstanceID())
+	allocator = alloc
 	log.Infof("allocator with backend [%s] initiated", allocator.Name())
-	allocators = append(allocators, allocator)
-	settings := sonyflake.Settings{
-		MachineID: func() (uint16, error) {
-			return allocator.Acquire(context.Background(), tenant)
-		},
-	}
-	sf := sonyflake.NewSonyflake(settings)
-	if sf == nil {
-		panic("sonyflake not created")
-	}
 
-	// initial a default tenant
-	sfs[tenant] = sf
+	// init a default tenant
+	tenant := "default"
+	_, err = newTenant(tenant)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func GenerateUID(tenant string) (uid uint64, err error) {
+	if tenant == "" {
+		tenant = "default"
+	}
+
 	sf := sfs[tenant]
+	// create tenant if not exist
 	if sf == nil {
-		err = fmt.Errorf("tenant %s not exist", tenant)
-		return
+		log.Warnf("tenant %s not exist, creating...", tenant)
+		if sf, err = newTenant(tenant); err != nil {
+			log.Errorf("create tenant %s failed: %s", tenant, err.Error())
+			return
+		}
 	}
 
 	uid, err = sf.NextID()
@@ -54,22 +59,18 @@ func GenerateUID(tenant string) (uid uint64, err error) {
 }
 
 func Close() {
-	for _, allocator := range allocators {
+	if allocator != nil {
 		allocator.Close()
 	}
 	log.Infof("closed sonyflake")
 }
 
-func config() (backend, tenant, addr string) {
+func config() (backend, addr string) {
 	backend = os.Getenv(env.BACKEND) // "redis" or "etcd"
-	tenant = os.Getenv(env.TENANT)
 	addr = os.Getenv(env.ADDR)
 
 	if backend == "" {
 		backend = "redis"
-	}
-	if tenant == "" {
-		tenant = "default"
 	}
 	if addr == "" {
 		addr = "127.0.0.1:6379"
@@ -86,4 +87,28 @@ func generateInstanceID() string {
 	}
 	timestamp := time.Now().UnixMilli()
 	return fmt.Sprintf("%s-%d", hex.EncodeToString(b), timestamp)
+}
+
+func newTenant(tenant string) (sf *sonyflake.Sonyflake, err error) {
+	if allocator == nil {
+		panic("no allocator created")
+	}
+	settings := sonyflake.Settings{
+		MachineID: func() (uint16, error) {
+			return allocator.Acquire(context.Background(), tenant)
+		},
+	}
+	sf = sonyflake.NewSonyflake(settings)
+	if sf == nil {
+		log.Errorf("sonyflake cannot be created for tenant %s", tenant)
+		return
+	}
+
+	lockSfs.Lock()
+	sfs[tenant] = sf
+	lockSfs.Unlock()
+
+	log.Infof("created new tenant %s", tenant)
+
+	return
 }

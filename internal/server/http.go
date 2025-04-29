@@ -9,7 +9,7 @@ import (
 func NewHTTPServer() *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/generator_uid", func(c *gin.Context) {
+	r.GET("/generate_uid", func(c *gin.Context) {
 		tenantID := c.Query("tenant_id")
 		uid, err := snowflake.GenerateUID(tenantID)
 		if err != nil {
