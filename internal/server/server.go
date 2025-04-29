@@ -5,7 +5,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
-	"net/http"
 )
 
 func RunServer() {
@@ -17,6 +16,5 @@ func RunServer() {
 		_ = grpcServer.Serve(lis)
 	}()
 
-	httpServer := NewHTTPServer()
-	_ = http.ListenAndServe(":8000", httpServer)
+	_ = NewHTTPServer().Run(":8000")
 }

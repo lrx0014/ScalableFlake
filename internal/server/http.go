@@ -1,35 +1,25 @@
 package server
 
 import (
-	"encoding/json"
-	allocator "github.com/lrx0014/ScalableFlake/pkg/machine"
+	"github.com/gin-gonic/gin"
 	"github.com/lrx0014/ScalableFlake/pkg/snowflake"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
-type HTTPServer struct {
-	allocator allocator.Allocator
-}
+func NewHTTPServer() *gin.Engine {
+	r := gin.Default()
 
-func NewHTTPServer() *HTTPServer {
-	return &HTTPServer{}
-}
+	r.GET("/generator_uid", func(c *gin.Context) {
+		tenantID := c.Query("tenant_id")
+		uid, err := snowflake.GenerateUID(tenantID)
+		if err != nil {
+			log.Errorf("failed to generate uid: %v", err)
+			c.JSON(500, gin.H{"error": "failed to generate UID"})
+			return
+		}
 
-func (s *HTTPServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	uid, err := snowflake.GenerateUID()
-	if err != nil {
-		log.Errorf("failed to generate uid: %v", err)
-		return
-	}
+		c.JSON(200, gin.H{"uid": uid})
+	})
 
-	resp := map[string]interface{}{
-		"uid": uid,
-	}
-	err = json.NewEncoder(w).Encode(resp)
-	if err != nil {
-		return
-	}
-
-	return
+	return r
 }
