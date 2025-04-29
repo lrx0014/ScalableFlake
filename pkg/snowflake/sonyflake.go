@@ -12,8 +12,6 @@ import (
 	"os"
 	"sync"
 	"time"
-
-	_ "github.com/lrx0014/ScalableFlake/pkg/driver/redis"
 )
 
 var lockSfs sync.RWMutex
