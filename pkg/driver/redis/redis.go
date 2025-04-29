@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/lrx0014/ScalableFlake/internal/shutdown"
 	allocator "github.com/lrx0014/ScalableFlake/pkg/machine"
 	"github.com/redis/go-redis/v9"
 	log "github.com/sirupsen/logrus"
@@ -143,8 +144,8 @@ func (r *AllocatorRedis) startLeaseRenewal(ctx context.Context, tenantID string,
 					return
 				}
 
-			case <-ctx.Done():
-				log.Infof("[INFO] Lease renewal stopped.")
+			case <-shutdown.Done():
+				log.Infof("lease renewal stopped.")
 				return
 			}
 		}
